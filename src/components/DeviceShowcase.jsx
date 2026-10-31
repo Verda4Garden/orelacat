@@ -172,13 +172,9 @@ export default function DeviceShowcase() {
               seed={device === "phone" ? 7 : device === "tablet" ? 13 : 21}
               width={380}
               action="none"
-              files={files}
               labelPlacement="top-left"
               open
               onOpenChange={() => {}}
-              /* The folder shows the small encode; the lightbox opens the
-                 full one. Before this split the page downloaded 11.8 MB of
-                 screenshots to draw four 272-px thumbnails. */
               files={files.map((f) => ({ ...f, image: f.thumb }))}
               onFileSelect={(file, i) => setViewing(i)}
             />
