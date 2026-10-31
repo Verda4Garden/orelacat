@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.vercel/
+*.log
+
+# probe scripts used to verify the page in a headless browser — not part of
+# the site, and they only run locally
+probe*.cjs
+snap.cjs
+shotpage.cjs
+hero.cjs
+diag.cjs
+shaderprobe.cjs
+tprobe.cjs
+verify.cjs
+final.cjs

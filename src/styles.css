@@ -1,0 +1,145 @@
+/* ============================================================
+   Orelacat — design tokens
+   The logo decides the palette: etched black, ivory ink, no
+   colour. Everything here is a value the logo already contains.
+   ============================================================ */
+
+:root {
+  --ink: #f2efe9;          /* ivory — the logo's line work */
+  --ink-dim: #a8a29a;      /* ivory at rest */
+  --ink-faint: #6b665f;    /* captions */
+  --void: #060606;         /* page */
+  --panel: #0d0d0c;        /* raised surface */
+  --panel-2: #131312;      /* raised again */
+  --line: #232220;         /* hairline */
+  --line-soft: #1a1918;
+  --ember: #b23a1f;        /* the one warm note — used sparingly */
+  --moss: #7c8a5f;         /* secondary accent, for status */
+
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --gut: clamp(20px, 5vw, 64px);
+  --maxw: 1240px;
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--void);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img { display: block; max-width: 100%; }
+
+/* Grain overlay — the logo is a printed etching, so the page
+   carries the same paper tooth rather than a clean gradient. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- type ---------- */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.6;
+  color: var(--ink-dim);
+  font-weight: 300;
+}
+
+/* ---------- layout ---------- */
+
+.shell {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-inline: var(--gut);
+}
+
+.section {
+  padding-block: clamp(72px, 11vw, 148px);
+  position: relative;
+}
+
+.hair {
+  height: 1px;
+  background: var(--line);
+  width: 100%;
+}
+
+/* ---------- reveal on scroll (21st.dev "blur-fade" pattern) ---------- */
+
+.reveal {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(14px);
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
+
+.reveal.in {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
