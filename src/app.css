@@ -145,6 +145,10 @@
   overflow: hidden;
   background: #000;
   position: relative;
+  /* Reserves the box before the image arrives. Without it the column height is
+     unknown until load, which is exactly the kind of late layout shift that
+     pushes LCP to the image instead of the headline. */
+  aspect-ratio: 1 / 1;
 }
 .hero-mark-frame::after {
   content: "";
@@ -1001,3 +1005,15 @@
 .lb-close:hover { color: var(--ink); background: rgba(242, 239, 233, 0.1); }
 
 .devices-glasses { display: flex; justify-content: center; }
+
+/* ---------- shader fallback ---------- */
+
+/* Shown while the Three.js chunk loads, and left in place if it never does:
+   the hero keeps its warm ring of light either way. */
+.hero-shader-static {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 42% at 50% -6%, rgba(196, 182, 158, 0.16), transparent 70%),
+    radial-gradient(ellipse 90% 55% at 50% 0%, rgba(120, 108, 92, 0.1), transparent 78%);
+}

@@ -3,7 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import { BlurFade, BlurReveal, MagneticButton, Marquee, NumberTicker, SpotlightCard, TextShimmer } from "./anim.jsx";
 import { activities, features, links, live, stats, subscribeLive } from "../content.js";
 import { footerPages, navPages } from "../seo-data.js";
-import { ShaderAnimation } from "./ui/shader-animation.jsx";
+import { lazy, Suspense } from "react";
+
+/* The shader is a Three.js scene. It is worth its weight on a desktop but it is
+   decoration, so it loads as its own chunk after first paint instead of sitting
+   in the entry bundle — Lighthouse measured 25 s of total blocking time on a
+   throttled phone, most of it this library parsing before anything rendered. */
+const ShaderAnimation = lazy(() => import("./ui/shader-animation.jsx"));
 
 
 /** Re-renders when the update feed answers. Returns the live version map. */
@@ -28,7 +34,7 @@ function Nav({ path }) {
     <header className={`nav ${solid ? "nav--solid" : ""}`}>
       <div className="nav-inner shell">
         <a className="nav-brand" href="#top">
-          <img src="/logo.jpeg" alt="" className="nav-logo" />
+          <img src="/logo-128.webp" alt="" className="nav-logo" width="26" height="26" decoding="async" />
           <span className="nav-word">orelacat</span>
         </a>
         <nav className="nav-links" aria-label="Halaman">
@@ -76,7 +82,13 @@ function Hero() {
   return (
     <section className="hero" id="top" ref={ref}>
       <div className="hero-shader" aria-hidden="true">
-        <ShaderAnimation speed={0.05} opacity={0.8} tint={[0.72, 0.66, 0.58]} />
+        {/* A static glow is the prerendered state: it costs nothing, and it is
+            what the page shows until the shader chunk arrives (or forever, if
+            the visitor has JavaScript off). */}
+        <div className="hero-shader-static" />
+        <Suspense fallback={null}>
+          <ShaderAnimation speed={0.05} opacity={0.8} tint={[0.72, 0.66, 0.58]} />
+        </Suspense>
       </div>
       <div className="hero-grid" aria-hidden="true" />
       <motion.div className="shell hero-inner" style={parallax ? { y, opacity } : undefined}>
@@ -143,14 +155,25 @@ function Hero() {
             </div>
           </BlurFade>
 
-          <BlurFade delay={0.62} className="hero-mark">
+          {/* Not wrapped in BlurFade: this crest is the largest element above
+              the fold, and starting it at opacity 0 held the paint back until
+              the animation began — Lighthouse attributed ~1.2 s of LCP to that
+              render delay. It now shows immediately. */}
+          <div className="hero-mark">
             <div className="hero-mark-frame">
-              <img src="/logo.jpeg" alt="Orelacat crest: a warrior flanked by two cats beneath a crest" />
+              <img
+                src="/logo.webp"
+                alt="Orelacat crest: a warrior flanked by two cats beneath a crest"
+                width="560"
+                height="560"
+                fetchPriority="high"
+                decoding="async"
+              />
             </div>
             <div className="hero-mark-cap">
               The crest, drawn for the player — a warrior between two cats.
             </div>
-          </BlurFade>
+          </div>
         </div>
 
         <BlurFade delay={0.75}>
@@ -379,7 +402,7 @@ function Footer() {
       <div className="shell">
         <div className="footer-top">
           <div className="footer-brand">
-            <img src="/logo.jpeg" alt="" className="footer-logo" />
+            <img src="/logo-128.webp" alt="" className="footer-logo" width="40" height="40" loading="lazy" decoding="async" />
             <div>
               <div className="footer-word">orelacat</div>
               <div className="footer-tag">Free music, no noise.</div>

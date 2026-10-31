@@ -7,7 +7,7 @@
 :root {
   --ink: #f2efe9;          /* ivory — the logo's line work */
   --ink-dim: #a8a29a;      /* ivory at rest */
-  --ink-faint: #6b665f;    /* captions */
+  --ink-faint: #8a847b;    /* captions — 5.4:1 on --void, was 3.6:1 (failed WCAG AA) */
   --void: #060606;         /* page */
   --panel: #0d0d0c;        /* raised surface */
   --panel-2: #131312;      /* raised again */
@@ -163,19 +163,23 @@ img { display: block; max-width: 100%; }
 /* The headline resolves out of a blur as one line. Kept in CSS rather than as
    framer-motion spans so the h1 holds exactly one text node: that is what a
    crawler indexes and what a screen reader announces. */
+/* Opacity and transform only: both are composited by the GPU. An earlier
+   version animated `filter: blur()` here, which forces the main thread to
+   repaint the whole headline every frame — it showed up in Lighthouse as a
+   non-composited animation and pushed LCP out by several seconds on a slow
+   phone. The movement is what reads as a reveal; the softening is gone. */
 .blur-reveal {
   display: inline-block;
-  animation: blur-reveal 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: blur-reveal 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
 }
 @keyframes blur-reveal {
   from {
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
     transform: translateY(0);
   }
 }

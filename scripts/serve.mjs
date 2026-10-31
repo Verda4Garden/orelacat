@@ -7,6 +7,7 @@
    every unknown route with the root index.html, which hides both the prerender
    and the 404 behaviour. */
 import { createServer } from "node:http";
+import { gzipSync } from "node:zlib";
 import { readFile, stat } from "node:fs/promises";
 import { join, extname, normalize } from "node:path";
 
@@ -47,9 +48,20 @@ createServer(async (req, res) => {
 
   for (const file of candidates) {
     if (await isFile(file)) {
-      const body = await readFile(file);
-      res.writeHead(200, { "Content-Type": TYPES[extname(file)] || "application/octet-stream" });
-      return res.end(body);
+      const raw = await readFile(file);
+      const type = TYPES[extname(file)] || "application/octet-stream";
+      // Vercel compresses text responses; without this the local profile shows
+      // an entry bundle several times its real transfer size and the Lighthouse
+      // numbers stop describing production.
+      const compressible = /text|javascript|json|xml|svg/.test(type);
+      const acceptsGzip = /gzip/.test(req.headers["accept-encoding"] || "");
+      if (compressible && acceptsGzip && raw.length > 1024) {
+        const body = gzipSync(raw);
+        res.writeHead(200, { "Content-Type": type, "Content-Encoding": "gzip", Vary: "Accept-Encoding" });
+        return res.end(body);
+      }
+      res.writeHead(200, { "Content-Type": type });
+      return res.end(raw);
     }
   }
 

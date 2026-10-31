@@ -54,8 +54,11 @@ export function BlurFade({ children, delay = 0, y = 12, className = "", once = t
     <motion.div
       ref={ref}
       className={className}
-      initial={armed ? { opacity: 0, filter: "blur(8px)", y } : false}
-      animate={armed && inView ? { opacity: 1, filter: "blur(0px)", y: 0 } : {}}
+      /* No filter here: blurring a large block forces a repaint of it every
+         frame on the main thread. Opacity and transform stay on the compositor,
+         which is what keeps this cheap on a slow phone. */
+      initial={armed ? { opacity: 0, y } : false}
+      animate={armed && inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}

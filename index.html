@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
-    <link rel="apple-touch-icon" href="/logo.jpeg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
 
     <!-- The canonical origin. Every absolute URL on the site is built from this. -->
     <link rel="canonical" href="https://www.orelacat.my.id/" />
@@ -44,12 +45,14 @@
     />
     <meta name="twitter:image" content="https://www.orelacat.my.id/og-image.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts are self-hosted. The two files the first paint needs are
+         preloaded; the rest arrive with the stylesheet. Google Fonts used to
+         sit here as a render-blocking request to two third-party origins. -->
+    <link rel="preload" href="/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- The version numbers on the page come from the update feed. Connecting
+         early saves the TLS handshake when the fetch starts at hydration. -->
+    <link rel="preconnect" href="https://orelacat-jam.orelacat.workers.dev" crossorigin />
   </head>
   <body>
     <!-- The prerendered markup goes inside #root, which is also what the client

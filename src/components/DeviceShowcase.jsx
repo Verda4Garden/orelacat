@@ -19,62 +19,73 @@ const FOLDER_FILES = {
   phone: [
     {
       name: "Listen Now",
-      meta: "PNG · feed + mini player",
-      image: "/shot-phone-home.png",
+      meta: "WEBP · feed + mini player",
+      image: "/shot-phone-home.webp",
+      thumb: "/shot-phone-home-thumb.webp",
     },
     {
       name: "Library",
-      meta: "PNG · recap, downloads, local",
-      image: "/shot-phone-library.png",
+      meta: "WEBP · recap, downloads, local",
+      image: "/shot-phone-library.webp",
+      thumb: "/shot-phone-library-thumb.webp",
     },
     {
       name: "Now playing",
-      meta: "PNG · artwork + controls",
-      image: "/shot-phone-player.png",
+      meta: "WEBP · artwork + controls",
+      image: "/shot-phone-player.webp",
+      thumb: "/shot-phone-player-thumb.webp",
     },
     {
       name: "Lyrics",
-      meta: "PNG · word-timed",
-      image: "/shot-phone-lyrics.png",
+      meta: "WEBP · word-timed",
+      image: "/shot-phone-lyrics.webp",
+      thumb: "/shot-phone-lyrics-thumb.webp",
     },
   ],
   tablet: [
     {
       name: "Listen Now",
-      meta: "PNG · landscape feed",
-      image: "/shot-tablet-home.png",
+      meta: "WEBP · landscape feed",
+      image: "/shot-tablet-home.webp",
+      thumb: "/shot-tablet-home-thumb.webp",
     },
     {
       name: "Library",
-      meta: "PNG · recap + playlists",
-      image: "/shot-tablet-library.png",
+      meta: "WEBP · recap + playlists",
+      image: "/shot-tablet-library.webp",
+      thumb: "/shot-tablet-library-thumb.webp",
     },
     {
       name: "Now playing",
-      meta: "PNG · wide, with lyrics",
-      image: "/shot-tablet-player.png",
+      meta: "WEBP · wide, with lyrics",
+      image: "/shot-tablet-player.webp",
+      thumb: "/shot-tablet-player-thumb.webp",
     },
   ],
   desktop: [
     {
       name: "Home",
-      meta: "PNG · feed, lyrics, player",
-      image: "/shot-desktop-3.png",
+      meta: "WEBP · feed, lyrics, player",
+      image: "/shot-desktop-3.webp",
+      thumb: "/shot-desktop-3-thumb.webp",
     },
     {
       name: "History",
-      meta: "PNG · what you played",
-      image: "/shot-desktop-1.png",
+      meta: "WEBP · what you played",
+      image: "/shot-desktop-1.webp",
+      thumb: "/shot-desktop-1-thumb.webp",
     },
     {
       name: "Fullscreen",
-      meta: "PNG · lyrics view",
-      image: "/shot-desktop-2.png",
+      meta: "WEBP · lyrics view",
+      image: "/shot-desktop-2.webp",
+      thumb: "/shot-desktop-2-thumb.webp",
     },
     {
       name: "About",
-      meta: "PNG · v6.2.6 desktop",
-      image: "/shot-desktop-4.png",
+      meta: "WEBP · v6.2.6 desktop",
+      image: "/shot-desktop-4.webp",
+      thumb: "/shot-desktop-4-thumb.webp",
     },
   ],
 };
@@ -165,6 +176,10 @@ export default function DeviceShowcase() {
               labelPlacement="top-left"
               open
               onOpenChange={() => {}}
+              /* The folder shows the small encode; the lightbox opens the
+                 full one. Before this split the page downloaded 11.8 MB of
+                 screenshots to draw four 272-px thumbnails. */
+              files={files.map((f) => ({ ...f, image: f.thumb }))}
               onFileSelect={(file, i) => setViewing(i)}
             />
           </div>

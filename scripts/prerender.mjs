@@ -61,7 +61,7 @@ function structuredData(page, url) {
     "@id": `${SITE.origin}/#organization`,
     name: SITE.name,
     url: SITE.origin,
-    logo: `${SITE.origin}/logo.jpeg`,
+    logo: `${SITE.origin}/icon-512.png`,
     sameAs: [
       "https://linktr.ee/FahrillAS",
       "https://www.instagram.com/fahril29124",

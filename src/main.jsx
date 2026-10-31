@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
+import "./fonts.css";
 import App from "./App.jsx";
 
 /* The build prerenders each route into #root, so the first paint is real HTML.
@@ -13,12 +14,11 @@ const app = (
   </StrictMode>
 );
 
-/* The prerendered HTML stays in place for crawlers, but React does not adopt
-   it: it renders fresh into the same node. Hydrating this tree proved fragile —
-   three libraries (framer-motion, the Three.js shader, the glass folder) write
-   inline styles that differ between the server and the client's first render,
-   and React reports every difference as a hydration error. A clean client
-   render produces the identical DOM with no warnings, and the static HTML has
-   already done its job by the time this runs. */
+/* The prerendered HTML stays for crawlers; React then renders the same tree
+   into #root itself. Hydrating is not viable — framer-motion, the Three.js
+   shader and the glass folder write inline styles that differ between server
+   and client, and every difference surfaces as error #418. A parallel render
+   was tried as well and made total blocking time twice as bad, so the node is
+   simply cleared. */
 container.innerHTML = "";
 createRoot(container).render(app);
