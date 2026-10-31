@@ -14,38 +14,24 @@ import { useEffect, useRef, useState } from "react";
  * headlines under ~8 words: splitting creates one span per
  * character, and the cost is only worth paying for display type.
  */
-export function BlurReveal({ text, delay = 0, className = "", as = "span" }) {
+export function BlurReveal({ text, delay = 0, className = "" }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-12% 0px" });
-  const words = text.split(" ");
-  let index = 0;
 
+  /* One text node. No per-character spans, no hidden duplicate.
+     Earlier versions split the headline so each character could blur in; that
+     made a crawler read "M u s i c", and the hidden copy I added to fix it put
+     the phrase in the h1 twice. The reveal is now a CSS animation on the whole
+     line (`.blur-reveal`, in styles.css) — same feel, one clean string, and no
+     hydration surface for framer-motion to disagree about. */
   return (
-    <span ref={ref} className={className} aria-label={text} style={{ display: "inline" }}>
-      {words.map((word, w) => (
-        <span key={w} style={{ display: "inline-block", whiteSpace: "nowrap" }}>
-          {[...word].map((char) => {
-            const i = index++;
-            return (
-              <motion.span
-                key={i}
-                aria-hidden="true"
-                style={{ display: "inline-block" }}
-                initial={{ opacity: 0, filter: "blur(10px)", y: 8 }}
-                animate={inView ? { opacity: 1, filter: "blur(0px)", y: 0 } : {}}
-                transition={{
-                  duration: 0.55,
-                  delay: delay + i * 0.028,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                {char}
-              </motion.span>
-            );
-          })}
-          {w < words.length - 1 && <span>&nbsp;</span>}
-        </span>
-      ))}
+    <span
+      ref={ref}
+      className={`blur-reveal ${className}`}
+      data-in={inView ? "1" : undefined}
+      style={{ animationDelay: `${delay}s` }}
+    >
+      {text}
     </span>
   );
 }
@@ -60,12 +46,16 @@ export function BlurReveal({ text, delay = 0, className = "", as = "span" }) {
 export function BlurFade({ children, delay = 0, y = 12, className = "", once = true }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once, margin: "-10% 0px" });
+  // Same reasoning as BlurReveal: no animation style until after mount, so the
+  // prerendered HTML and the client's first render match.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => setArmed(true), []);
   return (
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, filter: "blur(8px)", y }}
-      animate={inView ? { opacity: 1, filter: "blur(0px)", y: 0 } : {}}
+      initial={armed ? { opacity: 0, filter: "blur(8px)", y } : false}
+      animate={armed && inView ? { opacity: 1, filter: "blur(0px)", y: 0 } : {}}
       transition={{ duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
@@ -111,7 +101,10 @@ export function NumberTicker({ value, suffix = "", decimals = 0 }) {
   const motionValue = useMotionValue(0);
   const spring = useSpring(motionValue, { damping: 34, stiffness: 90 });
   const display = useTransform(spring, (v) => v.toFixed(decimals));
-  const [shown, setShown] = useState("0");
+  // Start at the real number, not zero: the counter is decoration, and a
+  // prerendered page must state "155 MB", not "0 MB". The animation only
+  // replays on the client after hydration.
+  const [shown, setShown] = useState(() => value.toFixed(decimals));
 
   useEffect(() => {
     if (inView) motionValue.set(value);
@@ -198,14 +191,22 @@ export function MagneticButton({ children, className = "", href, onClick, streng
  */
 export function SpotlightCard({ children, className = "", style }) {
   const ref = useRef(null);
-  const [pos, setPos] = useState({ x: 50, y: 0 });
-  const [active, setActive] = useState(false);
+  // The glow is written only after the first pointer event. Rendering it on the
+  // server meant the prerendered HTML carried `opacity:0` and a gradient at
+  // 50%/0%, while the client's first render produced different inline styles —
+  // a hydration mismatch React reports as error #418.
+  const [glow, setGlow] = useState(null);
 
   function move(e) {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    setGlow({
+      opacity: 1,
+      background: `radial-gradient(340px circle at ${x}% ${y}%, rgba(242,239,233,0.07), transparent 70%)`,
+    });
   }
 
   return (
@@ -214,16 +215,9 @@ export function SpotlightCard({ children, className = "", style }) {
       className={`spotlight ${className}`}
       style={style}
       onPointerMove={move}
-      onPointerEnter={() => setActive(true)}
-      onPointerLeave={() => setActive(false)}
+      onPointerLeave={() => setGlow(null)}
     >
-      <div
-        className="spotlight-glow"
-        style={{
-          opacity: active ? 1 : 0,
-          background: `radial-gradient(340px circle at ${pos.x}% ${pos.y}%, rgba(242,239,233,0.07), transparent 70%)`,
-        }}
-      />
+      <div className="spotlight-glow" style={glow ?? undefined} />
       {children}
     </div>
   );

@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 import { useEffect, useRef, useState } from "react";
 import { BlurFade, BlurReveal, MagneticButton, Marquee, NumberTicker, SpotlightCard, TextShimmer } from "./anim.jsx";
 import { activities, features, links, live, stats, subscribeLive } from "../content.js";
+import { footerPages, navPages } from "../seo-data.js";
 import { ShaderAnimation } from "./ui/shader-animation.jsx";
 
 
@@ -14,7 +15,7 @@ function useLiveVersions() {
 
 /* ---------- nav ---------- */
 
-function Nav() {
+function Nav({ path }) {
   const [solid, setSolid] = useState(false);
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 24);
@@ -30,11 +31,23 @@ function Nav() {
           <img src="/logo.jpeg" alt="" className="nav-logo" />
           <span className="nav-word">orelacat</span>
         </a>
-        <nav className="nav-links" aria-label="Sections">
-          <a href="#devices">Devices</a>
-          <a href="#features">Features</a>
-          <a href="#privacy">Privacy</a>
-          <a href="#pricing">Membership</a>
+        <nav className="nav-links" aria-label="Halaman">
+          {navPages.length > 0 ? (
+            navPages.map((p) => (
+              <a key={p.path} href={p.path} aria-current={path === p.path ? "page" : undefined}>
+                {p.label}
+              </a>
+            ))
+          ) : (
+            // No page is finished yet. Link to the sections that do exist rather
+            // than showing an empty nav or advertising pages that are noindex.
+            <>
+              <a href="#devices">Pratinjau</a>
+              <a href="#features">Fitur</a>
+              <a href="#privacy">Privasi</a>
+              <a href="#pricing">Membership</a>
+            </>
+          )}
         </nav>
         <MagneticButton href={links.linktree} className="btn btn--ghost nav-cta" strength={4}>
           Links
@@ -53,13 +66,20 @@ function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
+  /* The scroll-linked transform is attached only after mount. On the server the
+     style would be written as `opacity:1;transform:none`, and the client's first
+     render produces the same values but through a different path — enough for
+     React to see a mismatch and re-render the subtree. */
+  const [parallax, setParallax] = useState(false);
+  useEffect(() => setParallax(true), []);
+
   return (
     <section className="hero" id="top" ref={ref}>
       <div className="hero-shader" aria-hidden="true">
         <ShaderAnimation speed={0.05} opacity={0.8} tint={[0.72, 0.66, 0.58]} />
       </div>
       <div className="hero-grid" aria-hidden="true" />
-      <motion.div className="shell hero-inner" style={{ y, opacity }}>
+      <motion.div className="shell hero-inner" style={parallax ? { y, opacity } : undefined}>
         <div className="hero-top">
           <span className="eyebrow">
             <span className="dot" />{" "}
@@ -365,13 +385,24 @@ function Footer() {
               <div className="footer-tag">Free music, no noise.</div>
             </div>
           </div>
-          <div className="footer-links">
-            <a href={links.linktree}>Linktree</a>
-            <a href={links.whatsapp}>WhatsApp channel</a>
-            <a href={links.instagram}>Instagram</a>
-            <a href={links.tiktok}>TikTok</a>
+          <nav className="footer-links" aria-label="Peta situs">
+            {footerPages.map((p) => (
+              <a key={p.path} href={p.path}>
+                {p.label}
+              </a>
+            ))}
+            <a href={links.linktree} rel="me">
+              Linktree
+            </a>
+            <a href={links.whatsapp}>Saluran WhatsApp</a>
+            <a href={links.instagram} rel="me">
+              Instagram
+            </a>
+            <a href={links.tiktok} rel="me">
+              TikTok
+            </a>
             <a href={links.trakteer}>Trakteer</a>
-          </div>
+          </nav>
         </div>
         <div className="footer-bottom">
           <span>

@@ -1,14 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Orelacat — music without the noise</title>
+    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
+    <link rel="apple-touch-icon" href="/logo.jpeg" />
+
+    <!-- The canonical origin. Every absolute URL on the site is built from this. -->
+    <link rel="canonical" href="https://www.orelacat.my.id/" />
+
+    <!-- Primary meta. Rewritten per page at build time by scripts/prerender.mjs;
+         these values are the fallback for the home page. -->
+    <title>Orelacat — Pemutar Musik Tanpa Iklan</title>
     <meta
       name="description"
-      content="Orelacat is a free, ad-free music player with a dynamic island that follows your song. Phone, tablet and desktop."
+      content="Orelacat: pemutar musik gratis tanpa iklan dengan dynamic island yang mengikuti lagumu. Ada di HP, tablet, dan desktop. Dukung komunitas lewat membership."
     />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#060606" />
+    <meta name="author" content="FahrillAS" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Orelacat" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:title" content="Orelacat — Pemutar Musik Tanpa Iklan" />
+    <meta
+      property="og:description"
+      content="Pemutar musik gratis tanpa iklan dengan dynamic island yang mengikuti lagumu. HP, tablet, dan desktop."
+    />
+    <meta property="og:url" content="https://www.orelacat.my.id/" />
+    <meta property="og:image" content="https://www.orelacat.my.id/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Orelacat — pemutar musik tanpa iklan" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Orelacat — Pemutar Musik Tanpa Iklan" />
+    <meta
+      name="twitter:description"
+      content="Pemutar musik gratis tanpa iklan dengan dynamic island yang mengikuti lagumu."
+    />
+    <meta name="twitter:image" content="https://www.orelacat.my.id/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,7 +52,12 @@
     />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- The prerendered markup goes inside #root, which is also what the client
+         hydrates. Keeping it inside matters: React 19 hoists document-level
+         resources it renders (the preload <link>s) to <body>, so markup written
+         outside #root makes the hydrate target look different from the tree and
+         React re-renders from scratch — doubling the page. -->
+    <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
