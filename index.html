@@ -3,9 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The icon set. Google shows the favicon beside a search result only if it
+         can fetch one at a size it likes (a multiple of 48 px), so /icon-192.png
+         and a real /favicon.ico both exist. The .ico matters: some crawlers look
+         for that path alone and ignore these <link> tags, and a missing icon is
+         what leaves a generic globe in the results. -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
 
     <!-- The canonical origin. Every absolute URL on the site is built from this. -->
     <link rel="canonical" href="https://www.orelacat.my.id/" />

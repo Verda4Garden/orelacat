@@ -201,19 +201,82 @@
 @media (max-width: 860px) {
   .hero { padding-top: 116px; }
   .hero-cols { grid-template-columns: 1fr; }
-  .hero-mark { order: -1; max-width: 320px; }
-  .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-mark { order: -1; max-width: 340px; }
+  .hero-stats { margin-top: 48px; }
+  .hero-stat { padding: 18px 16px; }
+}
+
+/* Phones. Everything below is spacing and type scale only — no layout change,
+   so the design reads the same, it just stops being squeezed. */
+@media (max-width: 620px) {
+  /* Left: a long version string that must wrap. Right: two short words that
+     must not. Sizing the row to its content keeps "free forever" whole instead
+     of breaking it in half. */
+  /* A grid, not flex: the two eyebrows must stay in their two cells so the
+     sentence in the left one keeps its word order. `1fr auto` lets the short
+     right cell stay whole while the long left one wraps. */
+  .hero-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 12px;
+  }
+  .hero-top .eyebrow { font-size: 10px; letter-spacing: 0.14em; line-height: 1.55; }
+  .hero-top-right { white-space: nowrap; }
+  .hero-stat { padding: 16px 14px; }
+  .hero-stat-num { font-size: clamp(22px, 7vw, 28px); }
+  .hero-stat-label { font-size: 10.5px; letter-spacing: 0.08em; line-height: 1.5; }
+  .hero-mark-cap { font-size: 10px; }
+  .hero-stats { margin-top: 36px; }
+}
+
+@media (max-width: 380px) {
+  .hero-stat { padding: 14px 12px; }
+  .hero-stat-num { font-size: 21px; }
+  .hero-stat-label { font-size: 10px; }
+}
+
+/* Touch. A finger is not a mouse pointer: anything smaller than ~44 px square
+   is a miss waiting to happen, and the footer links were 15 px tall. Nothing
+   moves visually — the padding grows and negative margins keep the row's own
+   rhythm, so the spacing still reads as designed. */
+@media (hover: none), (max-width: 620px) {
+  .devices-tab,
+  .faq-q,
+  .nav-cta,
+  .footer-links a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .devices-tab { padding-block: 8px; }
+  /* The footer links are bare <a> with no class of their own, so they are
+     targeted through their container. The negative margin stops the added
+     padding from opening a hole in the footer's rhythm. */
+  .footer-links { gap: 2px 18px; margin-block: -12px; }
+  .footer-links a { padding-block: 14px; display: inline-flex; align-items: center; min-height: 44px; }
+  /* iOS Safari zooms the page in when a control smaller than 16 px is focused;
+     keeping form text at 16 px is what stops the whole layout shifting. */
+  input, select, textarea { font-size: 16px; }
 }
 
 /* ---------- marquee strip ---------- */
 
+/* The marquee's content is `max-content` — 3000 px of repeated words. `overflow:
+   hidden` clips it visually but does not stop it from setting the document's
+   scroll width, so on a 360 px phone the page scrolled 63 px sideways into
+   nothing. `min-width: 0` plus `contain: paint` makes the strip a real box its
+   child cannot widen. */
 .strip {
   border-block: 1px solid var(--line);
   padding-block: 15px;
   overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+  contain: paint;
   background: var(--panel);
 }
-.marquee { overflow: hidden; }
+.marquee { overflow: hidden; min-width: 0; max-width: 100%; }
 .marquee-track {
   display: flex;
   width: max-content;
@@ -1005,6 +1068,18 @@
 .lb-close:hover { color: var(--ink); background: rgba(242, 239, 233, 0.1); }
 
 .devices-glasses { display: flex; justify-content: center; }
+
+/* The opened folder's sheets are translated and rotated in the folder's own
+   coordinate space, so on a phone the leftmost sheet lands outside the column
+   and is clipped by the viewport. A gutter on the wrapper (and a matching
+   negative margin so nothing else shifts) gives them somewhere to go. */
+@media (max-width: 620px) {
+  /* Padding alone widened the column and re-created the overflow. Clipping the
+     wrapper while giving the folder a smaller box is what actually contains it:
+     the deck keeps its shape, the page keeps its width. */
+  .devices-stage--shots { overflow: clip; }
+  .devices-glasses { padding-inline: 0; width: 100%; }
+}
 
 /* ---------- shader fallback ---------- */
 

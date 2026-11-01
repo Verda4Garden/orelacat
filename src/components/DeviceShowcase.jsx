@@ -170,7 +170,7 @@ export default function DeviceShowcase() {
               tone="dark"
               art={meta.art}
               seed={device === "phone" ? 7 : device === "tablet" ? 13 : 21}
-              width={380}
+              width={380} /* the folder clamps this to the room it actually has */
               action="none"
               labelPlacement="top-left"
               open

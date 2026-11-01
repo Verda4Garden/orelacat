@@ -576,7 +576,26 @@ export default function GlassFolder({
   const [menuOpen, setMenuOpen] = React.useState(false)
   const [entered, setEntered] = React.useState(!appear)
 
-  const k = width / W
+  // The stage is a fixed 340-unit drawing scaled by `k`. A width passed in from
+  // a layout is a request, not a promise: on a 360 px phone the folder sits
+  // inside padding, so honouring a 380 request overflowed the page by 55 px and
+  // gave the whole document a horizontal scrollbar. Clamp k to the room that
+  // actually exists.
+  const [room, setRoom] = React.useState(Infinity)
+  React.useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(() => {
+      // Measure the space the folder is allowed to occupy, not its own box:
+      // the box is already `width` wide, so measuring it just returns the
+      // number that caused the overflow. The grandparent is the layout cell.
+      const cell = rootRef.current?.parentElement?.parentElement || rootRef.current?.parentElement
+      const avail = cell?.getBoundingClientRect().width || Infinity
+      setRoom(avail)
+    })
+    if (rootRef.current) ro.observe(rootRef.current.parentElement || rootRef.current)
+    return () => ro.disconnect()
+  }, [])
+  const k = Math.min(width, room) / W
   const density = Math.min(1.5, Math.max(1, typeof window === "undefined" ? 1 : window.devicePixelRatio || 1)) * k
 
   // ---- entrance: assemble the first time the folder is on screen ----------
@@ -717,7 +736,7 @@ export default function GlassFolder({
       data-open={open || undefined}
       data-entered={entered || undefined}
       data-place={labelPlacement}
-      style={{ width, height: (H + HEADROOM) * k, ...style }}
+      style={{ width: W * k, height: (H + HEADROOM) * k, ...style }}
     >
       <style>{GF_CSS}</style>
       <div className="gf-stage" style={{ transform: "translateY(" + HEADROOM * k + "px) scale(" + k + ")" }}>
@@ -924,6 +943,15 @@ const GF_CSS = `
 .gf-root[data-tone="dark"] { --gf-ink: #f5f5f7; --gf-ink-soft: rgba(245, 245, 247, .58); }
 .gf-root:hover, .gf-root:focus-within { --gf-hinge: -11deg; --gf-lift: -34px; --gf-spread: 8px; --gf-fan: 1.4deg; --gf-stack: 10px; }
 .gf-root[data-open] { --gf-hinge: -24deg; --gf-lift: -96px; --gf-spread: 40px; --gf-fan: 5deg; --gf-stack: 30px; }
+
+/* On a phone the open fan is wider than the screen: the sheet offsets are in
+   the folder's own units, but the fan rotation swings the outer sheets past the
+   left edge. Tightening the spread and the angle keeps every card inside the
+   viewport without changing the deck's shape. */
+@media (max-width: 620px) {
+  .gf-root[data-open] { --gf-spread: 20px; --gf-fan: 2.6deg; --gf-lift: -78px; --gf-stack: 22px; }
+  .gf-root:hover, .gf-root:focus-within { --gf-spread: 6px; --gf-fan: 1deg; }
+}
 
 .gf-stage {
   position: absolute;
